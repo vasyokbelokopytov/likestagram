@@ -6,24 +6,50 @@ export const Authorization: React.FC = () => {
     <div className="w-96">
       <Form name="authorization">
         <Form.Item
-          name="username"
-          rules={[{ required: true, message: 'Please input your Username!' }]}
+          name="email"
+          rules={[
+            {
+              required: true,
+              message: 'Будь ласка, введіть свій e-mail!',
+              whitespace: true,
+            },
+          ]}
         >
-          <Input placeholder="Username" />
+          <Input placeholder="Ваш e-mail..." />
+        </Form.Item>
+        <Form.Item
+          name="username"
+          rules={[
+            {
+              required: true,
+              message: 'Будь ласка, введіть свій nickname!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder="Ваш username..." />
         </Form.Item>
         <Form.Item
           name="password"
-          rules={[{ required: true, message: 'Please input your Password!' }]}
+          rules={[
+            {
+              required: true,
+              message: 'Будь ласка, введіть свій пароль!',
+              whitespace: true,
+            },
+          ]}
         >
-          <Input type="password" placeholder="Password" />
+          <Input type="password" placeholder="Ваш пароль..." />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" className="bg-sky-500 mr-4">
-            Log in
+            Війти
           </Button>
           <Link to="/register">
-            <Typography.Text className="text-sky-500">Sign in</Typography.Text>
+            <Typography.Text className="text-sky-500">
+              Зареєструватися
+            </Typography.Text>
           </Link>
         </Form.Item>
       </Form>

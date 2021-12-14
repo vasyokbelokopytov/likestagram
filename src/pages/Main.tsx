@@ -1,5 +1,5 @@
-import { UserCard } from '../components/UserCard';
+import { UsersCard } from '../components/UsersCard/UsersCard';
 
 export const Main: React.FC = () => {
-  return <UserCard />;
+  return <UsersCard />;
 };

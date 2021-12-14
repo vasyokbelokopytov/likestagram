@@ -11,64 +11,80 @@ export const Registration: React.FC = () => {
           rules={[
             {
               type: 'email',
-              message: 'The input is not valid E-mail!',
+              message: 'E-mail невалідний!',
             },
             {
               required: true,
-              message: 'Please input your E-mail!',
+              message: 'Будь ласка, введіть свій e-mail!',
+              whitespace: true,
             },
           ]}
         >
-          <Input placeholder="Your email..." />
+          <Input placeholder="Ваш e-mail..." />
         </Form.Item>
 
         <Form.Item
           name="password"
-          label="Password"
+          label="Пароль"
           rules={[
             {
               required: true,
-              message: 'Please input your password!',
-            },
-          ]}
-        >
-          <Input.Password placeholder="Your password..." />
-        </Form.Item>
-
-        <Form.Item
-          name="Username"
-          label="Username"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your username!',
+              message: 'Будь ласка, введіть свій пароль!',
               whitespace: true,
             },
           ]}
         >
-          <Input placeholder="Your username..." />
+          <Input.Password placeholder="Ваш пароль..." />
         </Form.Item>
 
         <Form.Item
-          name="name"
-          label="Name"
+          name="username"
+          label="Nickname"
           rules={[
             {
               required: true,
-              message: 'Please input your name!',
+              message: 'Будь ласка, введіть свій nickname!',
               whitespace: true,
             },
           ]}
         >
-          <Input placeholder="Your name..." />
+          <Input placeholder="Ваш nickname..." />
+        </Form.Item>
+
+        <Form.Item
+          name="first_name"
+          label="Ім'я"
+          rules={[
+            {
+              required: true,
+              message: "Будь ласка, введіть своє ім'я!",
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder="Ваше ім'я..." />
+        </Form.Item>
+
+        <Form.Item
+          name="last_name"
+          label="Прізвище"
+          rules={[
+            {
+              required: true,
+              message: 'Будь ласка, введіть своє прізвище!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input placeholder="Ваше прізвище..." />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit" className="bg-sky-500 mr-4">
-            Register
+            Зареєструватися
           </Button>
           <Link to="/login">
-            <Typography.Text className="text-sky-500">Sign in</Typography.Text>
+            <Typography.Text className="text-sky-500">Війти</Typography.Text>
           </Link>
         </Form.Item>
       </Form>

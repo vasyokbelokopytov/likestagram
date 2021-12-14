@@ -3,8 +3,8 @@ type Id = number;
 export interface User {
   username: string;
   email: string;
-  instagram: string | null;
-  telegram: string | null;
+  first_name: string;
+  last_name: string;
   description: string;
 }
 
@@ -18,4 +18,8 @@ export interface WithId {
 
 export interface WithPassword {
   password: string;
+}
+
+export interface WithIsLiked {
+  isLiked: boolean;
 }
