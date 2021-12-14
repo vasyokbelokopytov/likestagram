@@ -1,8 +1,5 @@
-import { Button, Card } from 'antd';
+import { useState } from 'react';
 
-import { useEffect, useState } from 'react';
-import { HeartIcon } from '@heroicons/react/outline';
-import { XIcon } from '@heroicons/react/solid';
 import { FrontSide } from './FrontSide';
 import { BackSide } from './BackSide';
 import { useAppSelector } from '../../app/hooks';
@@ -11,7 +8,13 @@ export const UsersCard: React.FC = () => {
   const users = useAppSelector((state) => state.users.users);
 
   const [isFrontSide, setIsFrontSide] = useState(true);
-  const [frontUserIndex, setFrontUserIndex] = useState(0);
+  const [frontSideUser, setFrontSideUser] = useState(
+    users ? users[0] ?? null : null
+  );
+  const [backSideUser, setBackSideUser] = useState(
+    users ? users[0] ?? null : null
+  );
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const [rotateAngle, setRotateAngle] = useState(0);
   const [isTransition, setIsTransition] = useState(false);
@@ -34,31 +37,38 @@ export const UsersCard: React.FC = () => {
   };
 
   const likeClickHandler = () => {
+    const user = users
+      ? users.find((_, i) => i === currentIndex + 1) ?? null
+      : null;
+
     if (isFrontSide) {
+      setBackSideUser(user);
       setIsFrontSide(false);
-      rotateNext();
-      return;
+    } else {
+      setFrontSideUser(user);
+      setIsFrontSide(true);
     }
 
-    setFrontUserIndex((prev) => prev + 2);
-    setIsFrontSide(true);
+    setCurrentIndex((prev) => prev + 1);
     rotateNext();
   };
 
   const backClickHandler = () => {
+    const user = users
+      ? users.find((_, i) => i === currentIndex - 1) ?? null
+      : null;
+
     if (isFrontSide) {
-      setFrontUserIndex((prev) => prev - 2);
+      setBackSideUser(user);
       setIsFrontSide(false);
-      rotateBack();
-      return;
+    } else {
+      setFrontSideUser(user);
+      setIsFrontSide(true);
     }
 
-    setIsFrontSide(true);
+    setCurrentIndex((prev) => prev - 1);
     rotateBack();
   };
-
-  // const frontUser = users?.find((_, i) => i === pairNumber) ?? null;
-  // const backUser = users?.find((_, i) => i === pairNumber + 1) ?? null;
 
   return (
     <div
@@ -71,13 +81,13 @@ export const UsersCard: React.FC = () => {
       onTransitionEnd={resetAngle}
     >
       <FrontSide
-        user={users?.find((_, i) => i === frontUserIndex) ?? null}
+        user={frontSideUser}
         onBack={backClickHandler}
         onLike={likeClickHandler}
         onSkip={() => {}}
       />
       <BackSide
-        user={users?.find((_, i) => i === frontUserIndex + 1) ?? null}
+        user={backSideUser}
         onBack={backClickHandler}
         onLike={likeClickHandler}
         onSkip={() => {}}
