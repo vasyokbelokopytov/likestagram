@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { FrontSide } from './FrontSide';
-import { BackSide } from './BackSide';
-import { useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { changeIsLiked } from '../../features/users/usersSlice';
+import { Id } from '../../app/types';
+import { Side } from './Side';
 
 export const UsersCard: React.FC = () => {
   const users = useAppSelector((state) => state.users.users);
+  const dispatch = useAppDispatch();
 
   const [isFrontSide, setIsFrontSide] = useState(true);
   const [frontSideUser, setFrontSideUser] = useState(
@@ -19,10 +21,24 @@ export const UsersCard: React.FC = () => {
   const [rotateAngle, setRotateAngle] = useState(0);
   const [isTransition, setIsTransition] = useState(false);
 
-  const resetAngle = () => {
-    if (rotateAngle === 360 || rotateAngle === -360) {
+  useEffect(() => {
+    const user = users
+      ? users.find((_, i) => i === currentIndex) ?? null
+      : null;
+
+    if (isFrontSide) {
+      setFrontSideUser(user);
+    } else {
+      setBackSideUser(user);
+    }
+  }, [currentIndex, isFrontSide, users]);
+
+  const resetAngle = (e: React.TransitionEvent<HTMLDivElement>) => {
+    if (e.propertyName === 'transform') {
       setIsTransition(false);
-      setRotateAngle(0);
+      if (rotateAngle === 360 || rotateAngle === -360) {
+        setRotateAngle(0);
+      }
     }
   };
 
@@ -36,7 +52,7 @@ export const UsersCard: React.FC = () => {
     setRotateAngle((prev) => prev - 180);
   };
 
-  const likeClickHandler = () => {
+  const nextClickHandler = () => {
     const user = users
       ? users.find((_, i) => i === currentIndex + 1) ?? null
       : null;
@@ -70,27 +86,35 @@ export const UsersCard: React.FC = () => {
     rotateBack();
   };
 
+  const likeClickHandler = (id: Id) => {
+    dispatch(changeIsLiked(id));
+  };
+
   return (
     <div
-      className="w-96 h-full relative"
+      className="w-96 relative"
       style={{
-        transition: isTransition ? 'transform 300ms' : '',
+        transition: isTransition ? 'transform 2s' : '',
         transformStyle: 'preserve-3d',
         transform: `rotateY(${rotateAngle}deg)`,
       }}
       onTransitionEnd={resetAngle}
     >
-      <FrontSide
+      <Side
+        type="front"
         user={frontSideUser}
         onBack={backClickHandler}
         onLike={likeClickHandler}
-        onSkip={() => {}}
+        onNext={nextClickHandler}
+        disablebuttons={isTransition}
       />
-      <BackSide
+      <Side
+        type="back"
         user={backSideUser}
         onBack={backClickHandler}
         onLike={likeClickHandler}
-        onSkip={() => {}}
+        onNext={nextClickHandler}
+        disablebuttons={isTransition}
       />
     </div>
   );

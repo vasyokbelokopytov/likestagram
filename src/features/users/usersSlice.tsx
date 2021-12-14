@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { User, WithId, WithIsLiked, WithPhoto } from '../../app/types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Id, User, WithId, WithIsLiked, WithPhoto } from '../../app/types';
 
 export interface UsersState {
   users: (User & WithId & WithPhoto & WithIsLiked)[] | null;
@@ -14,7 +14,7 @@ const initialState: UsersState = {
   users: [
     {
       id: 1,
-      description: '1 User',
+      description: 'gagaga',
       email: '1 User@gmail.om',
       photo: null,
       username: 'username 1',
@@ -74,9 +74,16 @@ const initialState: UsersState = {
 const usersSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {},
+  reducers: {
+    changeIsLiked: (state, action: PayloadAction<Id>) => {
+      const user = state.users?.find((u) => u.id === action.payload);
+      if (user) {
+        user.isLiked = !user.isLiked;
+      }
+    },
+  },
 });
 
-export const {} = usersSlice.actions;
+export const { changeIsLiked } = usersSlice.actions;
 
 export default usersSlice.reducer;
