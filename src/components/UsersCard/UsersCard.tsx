@@ -22,9 +22,7 @@ export const UsersCard: React.FC = () => {
   const [isTransition, setIsTransition] = useState(false);
 
   useEffect(() => {
-    const user = users
-      ? users.find((_, i) => i === currentIndex) ?? null
-      : null;
+    const user = users?.[currentIndex] ?? null;
 
     if (isFrontSide) {
       setFrontSideUser(user);
@@ -53,9 +51,7 @@ export const UsersCard: React.FC = () => {
   };
 
   const nextClickHandler = () => {
-    const user = users
-      ? users.find((_, i) => i === currentIndex + 1) ?? null
-      : null;
+    const user = users?.[currentIndex + 1] ?? null;
 
     if (isFrontSide) {
       setBackSideUser(user);
@@ -70,9 +66,7 @@ export const UsersCard: React.FC = () => {
   };
 
   const backClickHandler = () => {
-    const user = users
-      ? users.find((_, i) => i === currentIndex - 1) ?? null
-      : null;
+    const user = users?.[currentIndex - 1] ?? null;
 
     if (isFrontSide) {
       setBackSideUser(user);
@@ -88,6 +82,21 @@ export const UsersCard: React.FC = () => {
 
   const likeClickHandler = (id: Id) => {
     dispatch(changeIsLiked(id));
+  };
+
+  const refreshClickHandler = () => {
+    if (users?.length) {
+      if (isFrontSide) {
+        setBackSideUser(users[0]);
+        setIsFrontSide(false);
+      } else {
+        setFrontSideUser(users[0]);
+        setIsFrontSide(true);
+      }
+
+      setCurrentIndex(0);
+      rotateNext();
+    }
   };
 
   return (
@@ -106,6 +115,7 @@ export const UsersCard: React.FC = () => {
         onBack={backClickHandler}
         onLike={likeClickHandler}
         onNext={nextClickHandler}
+        onRefresh={refreshClickHandler}
         disablebuttons={isTransition}
       />
       <Side
@@ -114,6 +124,7 @@ export const UsersCard: React.FC = () => {
         onBack={backClickHandler}
         onLike={likeClickHandler}
         onNext={nextClickHandler}
+        onRefresh={refreshClickHandler}
         disablebuttons={isTransition}
       />
     </div>

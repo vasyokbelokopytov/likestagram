@@ -1,4 +1,6 @@
-export type Id = number;
+export type Id = string;
+
+export type Token = string;
 
 export interface User {
   username: string;

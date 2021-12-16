@@ -14,6 +14,7 @@ interface Props {
   onLike: (id: Id) => void;
   onNext: () => void;
   onBack: () => void;
+  onRefresh: () => void;
   disablebuttons?: boolean;
 }
 
@@ -23,6 +24,7 @@ export const Side: React.FC<Props> = ({
   onBack,
   onLike,
   onNext,
+  onRefresh,
   disablebuttons = false,
 }) => {
   const likeHandler = () => {
@@ -55,7 +57,11 @@ export const Side: React.FC<Props> = ({
           />
         }
         actions={[
-          <button className="block w-full h-full" disabled={disablebuttons}>
+          <button
+            className="block w-full h-full"
+            disabled={disablebuttons}
+            onClick={onRefresh}
+          >
             <RefreshIcon className="h-8 w-8 mx-auto" />
           </button>,
         ]}

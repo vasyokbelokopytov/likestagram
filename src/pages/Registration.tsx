@@ -1,10 +1,50 @@
 import { Button, Form, Input, Typography } from 'antd';
 import { Link } from 'react-router-dom';
+import { User, WithPassword } from '../app/types';
+import { useAppDispatch, useAppSelector, useErrorMessage } from '../app/hooks';
+
+import { register, registrationErrorChanged } from '../features/auth/authSlice';
+import { useEffect } from 'react';
 
 export const Registration: React.FC = () => {
+  const fieldsErrors = useAppSelector(
+    (state) => state.auth.registrationFieldsErrors
+  );
+  const error = useAppSelector((state) => state.auth.registrationError);
+  const isLoading = useAppSelector((state) => state.auth.isRegistering);
+
+  const dispatch = useAppDispatch();
+
+  useErrorMessage(error, registrationErrorChanged);
+
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (fieldsErrors) {
+      const errorFields = (
+        Object.keys(fieldsErrors) as Array<keyof typeof fieldsErrors>
+      ).map((field) => ({
+        name: field,
+        errors: fieldsErrors[field],
+      }));
+
+      form.setFields(errorFields);
+    }
+  }, [fieldsErrors, form]);
+
+  const submitHandler = (user: User & WithPassword) => {
+    dispatch(register(user));
+  };
+
   return (
     <div className="w-96">
-      <Form name="registration" layout="vertical" requiredMark={false}>
+      <Form
+        form={form}
+        name="registration"
+        layout="vertical"
+        requiredMark={false}
+        onFinish={submitHandler}
+      >
         <Form.Item
           name="email"
           label="E-mail"
@@ -39,7 +79,7 @@ export const Registration: React.FC = () => {
 
         <Form.Item
           name="username"
-          label="Nickname"
+          label="Username"
           rules={[
             {
               required: true,
@@ -80,7 +120,12 @@ export const Registration: React.FC = () => {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="bg-sky-500 mr-4">
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="bg-sky-500 mr-4"
+            loading={isLoading}
+          >
             Зареєструватися
           </Button>
           <Link to="/login">
