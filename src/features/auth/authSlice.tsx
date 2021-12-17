@@ -24,11 +24,20 @@ type LoginValidationErrors = ValidationErrors<
   Partial<Credentials> & NonFieldErrors
 >;
 
+type EditingProfileValidationErrors = ValidationErrors<
+  Partial<User> & NonFieldErrors
+>;
+
 export interface AuthState {
   account: (User & WithId & WithPhoto) | null;
+  token: Token | null;
 
   isAccountFetching: boolean;
   accountFethingError: string | null;
+
+  isAccountEditing: boolean;
+  accountEditingError: string | null;
+  accountEditingFieldsErrors: EditingProfileValidationErrors | null;
 
   isRegistering: boolean;
   registrationFieldsErrors: RegistationValidationErrors | null;
@@ -45,9 +54,14 @@ export interface AuthState {
 
 const initialState: AuthState = {
   account: null,
+  token: localStorage.getItem('token'),
 
   isAccountFetching: true,
   accountFethingError: null,
+
+  isAccountEditing: true,
+  accountEditingError: null,
+  accountEditingFieldsErrors: null,
 
   isRegistering: false,
   registrationFieldsErrors: null,
@@ -147,6 +161,27 @@ export const getAccount = createAsyncThunk<
   }
 });
 
+export const editAccount = createAsyncThunk<
+  User & WithId & WithPhoto,
+  User,
+  {
+    rejectValue: EditingProfileValidationErrors;
+  }
+>('auth/accountEdit', async (user, { rejectWithValue }) => {
+  try {
+    const response = await authAPI.editAccount(user);
+    return response.data;
+  } catch (e) {
+    const error = e as AxiosError<EditingProfileValidationErrors>;
+
+    if (!error.response) {
+      throw error;
+    }
+
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -183,6 +218,8 @@ const authSlice = createSlice({
         state.isRegistering = true;
       })
       .addCase(register.fulfilled, (state, action) => {
+        state.registrationError = null;
+        state.registrationFieldsErrors = null;
         state.isRegistering = false;
         state.account = action.payload;
       })
@@ -199,7 +236,10 @@ const authSlice = createSlice({
         state.isLoggingIn = true;
       })
       .addCase(logIn.fulfilled, (state, action) => {
+        state.loggingInError = null;
+        state.loggingInFieldsErrors = null;
         state.isLoggingIn = false;
+        state.token = action.payload.key;
       })
       .addCase(logIn.rejected, (state, action) => {
         state.isLoggingIn = false;
@@ -219,8 +259,10 @@ const authSlice = createSlice({
       })
       .addCase(logOut.fulfilled, (state, action) => {
         state.isLoggingOut = false;
+        state.loggingOutError = null;
         state.loggingOutSucceedMessage = action.payload.detail;
         state.account = null;
+        state.token = null;
       })
       .addCase(logOut.rejected, (state, action) => {
         state.isLoggingOut = false;
@@ -241,6 +283,28 @@ const authSlice = createSlice({
           state.accountFethingError = action.payload;
         } else {
           state.accountFethingError = action.error.message ?? null;
+        }
+      })
+
+      .addCase(editAccount.pending, (state) => {
+        state.isAccountEditing = true;
+      })
+      .addCase(editAccount.fulfilled, (state, action) => {
+        state.accountEditingFieldsErrors = null;
+        state.accountEditingError = null;
+        state.isAccountEditing = false;
+        state.account = action.payload;
+      })
+      .addCase(editAccount.rejected, (state, action) => {
+        state.isAccountEditing = false;
+        if (action.payload) {
+          if (action.payload.non_field_errors?.length) {
+            state.accountEditingError = action.payload.non_field_errors[0];
+          }
+
+          state.accountEditingFieldsErrors = action.payload;
+        } else {
+          state.accountEditingError = action.error.message ?? null;
         }
       });
   },

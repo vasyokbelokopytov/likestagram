@@ -51,30 +51,34 @@ export const Registration: React.FC = () => {
           rules={[
             {
               type: 'email',
-              message: 'E-mail невалідний!',
+              message: 'E-mail is not valid!',
             },
             {
               required: true,
-              message: 'Будь ласка, введіть свій e-mail!',
+              message: 'Please, enter your e-mail!',
               whitespace: true,
+            },
+            {
+              max: 254,
+              message: 'Email must be 254 characters or fewer!',
             },
           ]}
         >
-          <Input placeholder="Ваш e-mail..." />
+          <Input placeholder="Your e-mail..." />
         </Form.Item>
 
         <Form.Item
           name="password"
-          label="Пароль"
+          label="Password"
           rules={[
             {
               required: true,
-              message: 'Будь ласка, введіть свій пароль!',
+              message: 'Please, enter your password!',
               whitespace: true,
             },
           ]}
         >
-          <Input.Password placeholder="Ваш пароль..." />
+          <Input.Password placeholder="Your password..." />
         </Form.Item>
 
         <Form.Item
@@ -83,40 +87,46 @@ export const Registration: React.FC = () => {
           rules={[
             {
               required: true,
-              message: 'Будь ласка, введіть свій nickname!',
+              message: 'Please, enter your username!',
               whitespace: true,
             },
+            { max: 150, message: 'Username must be 150 characters or fewer!' },
           ]}
         >
-          <Input placeholder="Ваш nickname..." />
+          <Input placeholder="Your username..." />
         </Form.Item>
 
         <Form.Item
           name="first_name"
-          label="Ім'я"
+          label="First name"
           rules={[
             {
               required: true,
-              message: "Будь ласка, введіть своє ім'я!",
+              message: 'Please, enter your first name!',
               whitespace: true,
+            },
+            {
+              max: 150,
+              message: 'First name must be 150 characters or fewer!',
             },
           ]}
         >
-          <Input placeholder="Ваше ім'я..." />
+          <Input placeholder="First name..." />
         </Form.Item>
 
         <Form.Item
           name="last_name"
-          label="Прізвище"
+          label="Last name"
           rules={[
             {
               required: true,
-              message: 'Будь ласка, введіть своє прізвище!',
+              message: 'Please, enter your last name!',
               whitespace: true,
             },
+            { max: 150, message: 'Last name must be 150 characters or fewer!' },
           ]}
         >
-          <Input placeholder="Ваше прізвище..." />
+          <Input placeholder="Your last name..." />
         </Form.Item>
 
         <Form.Item>
@@ -126,10 +136,10 @@ export const Registration: React.FC = () => {
             className="bg-sky-500 mr-4"
             loading={isLoading}
           >
-            Зареєструватися
+            Sign Up
           </Button>
           <Link to="/login">
-            <Typography.Text className="text-sky-500">Війти</Typography.Text>
+            <Typography.Text className="text-sky-500">Sign In</Typography.Text>
           </Link>
         </Form.Item>
       </Form>

@@ -47,7 +47,7 @@ export const Header: React.FC = () => {
             className="h-full w-40 flex justify-end items-center gap-2 group"
           >
             <Avatar className="bg-orange-300 shrink-0" size={'large'}>
-              {account.first_name[0].toUpperCase()}
+              {account.first_name[0]?.toUpperCase()}
             </Avatar>
             <Typography.Title
               level={5}

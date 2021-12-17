@@ -5,10 +5,7 @@ import { DetailMessage } from './authSlice';
 
 export const authAPI = {
   register: (user: User & WithPassword) => {
-    return template.post<User & WithId & WithPhoto>(
-      '/auth/registration/',
-      user
-    );
+    return template.post<User & WithId & WithPhoto>('/registration/', user);
   },
 
   logIn: (credentials: Credentials) => {
@@ -20,6 +17,10 @@ export const authAPI = {
   },
 
   getAccount: () => {
-    return template.get<User & WithId & WithPhoto>('/api/user/');
+    return template.get<User & WithId & WithPhoto>('/user/');
+  },
+
+  editAccount: (user: User) => {
+    return template.put<User & WithId & WithPhoto>('/user/', user);
   },
 };

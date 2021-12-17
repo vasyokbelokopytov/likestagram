@@ -7,6 +7,7 @@ import { Layout } from './components/Layout';
 import { getAccount } from './features/auth/authSlice';
 
 const App: React.FC = () => {
+  const token = useAppSelector((state) => state.auth.token);
   const accountFethingError = useAppSelector(
     (state) => state.auth.accountFethingError
   );
@@ -19,7 +20,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     dispatch(getAccount());
-  }, [dispatch]);
+  }, [dispatch, token]);
 
   if (accountFethingError) {
     return <AppError error={accountFethingError} loading={isAccountFetching} />;

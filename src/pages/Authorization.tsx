@@ -47,37 +47,47 @@ export const Authorization: React.FC = () => {
           name="email"
           rules={[
             {
+              type: 'email',
+              message: 'E-mail is not valid!',
+            },
+            {
               required: true,
-              message: 'Будь ласка, введіть свій e-mail!',
+              message: 'Please, enter your e-mail!',
               whitespace: true,
+            },
+            {
+              max: 254,
+              message: 'Email must be 254 characters or fewer!',
             },
           ]}
         >
-          <Input placeholder="Ваш e-mail..." />
+          <Input placeholder="Your e-mail..." />
         </Form.Item>
         <Form.Item
           name="username"
           rules={[
             {
               required: true,
-              message: 'Будь ласка, введіть свій username!',
+              message: 'Please, enter your username!',
               whitespace: true,
             },
+            { max: 150, message: 'Username must be 150 characters or fewer!' },
           ]}
         >
-          <Input placeholder="Ваш username..." />
+          <Input placeholder="Your username..." />
         </Form.Item>
         <Form.Item
           name="password"
+          label="Password"
           rules={[
             {
               required: true,
-              message: 'Будь ласка, введіть свій пароль!',
+              message: 'Please, enter your password!',
               whitespace: true,
             },
           ]}
         >
-          <Input.Password placeholder="Ваш пароль..." />
+          <Input.Password placeholder="Your password..." />
         </Form.Item>
 
         <Form.Item>
@@ -87,12 +97,10 @@ export const Authorization: React.FC = () => {
             className="bg-sky-500 mr-4"
             loading={isLoading}
           >
-            Війти
+            Sign In
           </Button>
           <Link to="/register">
-            <Typography.Text className="text-sky-500">
-              Зареєструватися
-            </Typography.Text>
+            <Typography.Text className="text-sky-500">Sign Up</Typography.Text>
           </Link>
         </Form.Item>
       </Form>
