@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { changeIsLiked } from '../../features/users/usersSlice';
+import {
+  useAppDispatch,
+  useAppSelector,
+  useErrorMessage,
+} from '../../app/hooks';
+import { changeLike } from '../../features/users/usersSlice';
 import { Id } from '../../app/types';
 import { Side } from './Side';
 
 export const UsersCard: React.FC = () => {
   const users = useAppSelector((state) => state.users.users);
+  const isLiking = useAppSelector((state) => state.users.isLiking);
+  const likeError = useAppSelector((state) => state.users.likingError);
+
+  useErrorMessage(likeError);
+
   const dispatch = useAppDispatch();
 
   const [isFrontSide, setIsFrontSide] = useState(true);
@@ -81,7 +90,7 @@ export const UsersCard: React.FC = () => {
   };
 
   const likeClickHandler = (id: Id) => {
-    dispatch(changeIsLiked(id));
+    dispatch(changeLike(id));
   };
 
   const refreshClickHandler = () => {
@@ -112,6 +121,7 @@ export const UsersCard: React.FC = () => {
       <Side
         type="front"
         user={frontSideUser}
+        isLoading={isLiking}
         onBack={backClickHandler}
         onLike={likeClickHandler}
         onNext={nextClickHandler}
@@ -121,6 +131,7 @@ export const UsersCard: React.FC = () => {
       <Side
         type="back"
         user={backSideUser}
+        isLoading={isLiking}
         onBack={backClickHandler}
         onLike={likeClickHandler}
         onNext={nextClickHandler}

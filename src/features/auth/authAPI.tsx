@@ -1,7 +1,13 @@
 import { template } from '../../app/api';
-import { Token, User, WithId, WithPassword, WithPhoto } from '../../app/types';
-import { Credentials } from '../../pages/Authorization';
-import { DetailMessage } from './authSlice';
+import {
+  Credentials,
+  DetailMessage,
+  Token,
+  User,
+  WithId,
+  WithPassword,
+  WithPhoto,
+} from '../../app/types';
 
 export const authAPI = {
   register: (user: User & WithPassword) => {
@@ -20,7 +26,11 @@ export const authAPI = {
     return template.get<User & WithId & WithPhoto>('/user/');
   },
 
-  editAccount: (user: User) => {
-    return template.put<User & WithId & WithPhoto>('/user/', user);
+  editAccount: (user: FormData) => {
+    return template.put<User & WithId & WithPhoto>('/user/', user, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 };

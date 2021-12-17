@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+export const baseURL = process.env.REACT_APP_API_URL;
+
 export const template = axios.create({
-  baseURL: 'http://138.68.73.43:1337',
+  baseURL,
   withCredentials: true,
 });
 

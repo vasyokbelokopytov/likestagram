@@ -1,9 +1,21 @@
 import { Button, Image, Upload, Form, Input, Typography } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { useAppSelector, useAppDispatch } from '../app/hooks';
+import {
+  useAppSelector,
+  useAppDispatch,
+  useImageUpload,
+  useErrorMessage,
+  useSuccessMessage,
+} from '../app/hooks';
 import { User } from '../app/types';
-import { editAccount } from '../features/auth/authSlice';
+import {
+  accountEditingErrorChanged,
+  accountEditingSucceedMessageChanged,
+  editAccount,
+} from '../features/auth/authSlice';
 import { useEffect } from 'react';
+import Avatar from 'antd/lib/avatar/avatar';
+import { UserOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
 
@@ -12,9 +24,18 @@ export const Settings = () => {
   const fieldsErrors = useAppSelector(
     (state) => state.auth.accountEditingFieldsErrors
   );
+  const succeedMessage = useAppSelector(
+    (state) => state.auth.accountEditingSucceedMessage
+  );
+  useSuccessMessage(succeedMessage, accountEditingSucceedMessageChanged);
+
+  const error = useAppSelector((state) => state.auth.accountEditingError);
+  useErrorMessage(error, accountEditingErrorChanged);
   const dispatch = useAppDispatch();
 
   const [form] = Form.useForm();
+  const { img, beforeUpload, dummyRequest, handleChange, handleRemove } =
+    useImageUpload();
 
   useEffect(() => {
     if (fieldsErrors) {
@@ -33,19 +54,42 @@ export const Settings = () => {
     form.resetFields();
   };
 
-  const submitHandler = (user: User) => {
-    dispatch(editAccount(user));
+  const submitHandler = (data: User) => {
+    const formData = new FormData();
+
+    (Object.keys(data) as Array<keyof typeof data>).forEach((item) => {
+      formData.append(item, data[item]);
+    });
+
+    if (img) {
+      formData.append('photo', img);
+    }
+
+    dispatch(editAccount(formData));
   };
 
   return (
     <div className="h-full flex justify-around">
       <div className="w-1/3 flex-shrink-0 flex flex-col justify-center items-center p-4">
-        <Image
-          src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-          width={190}
-        />
-        <Upload>
-          <Button icon={<UploadOutlined />} className="w-48 mt-4">
+        {account?.photo ? (
+          <Image src={account.photo} width={190} />
+        ) : (
+          <Avatar
+            className="bg-orange-300"
+            size={190}
+            shape="square"
+            icon={<UserOutlined />}
+          />
+        )}
+
+        <Upload
+          className="w-48 flex flex-col justify-center mt-4"
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+          onRemove={handleRemove}
+          customRequest={dummyRequest}
+        >
+          <Button icon={<UploadOutlined />} className="w-full">
             Click to Upload
           </Button>
         </Upload>
@@ -63,6 +107,7 @@ export const Settings = () => {
           <Form.Item
             name="email"
             label="E-mail"
+            initialValue={account?.email}
             rules={[
               {
                 type: 'email',
@@ -84,6 +129,7 @@ export const Settings = () => {
           <Form.Item
             name="username"
             label="Username"
+            initialValue={account?.username}
             rules={[
               {
                 required: true,
@@ -101,6 +147,7 @@ export const Settings = () => {
           <Form.Item
             name="first_name"
             label="First name"
+            initialValue={account?.first_name}
             rules={[
               {
                 required: true,
@@ -119,6 +166,7 @@ export const Settings = () => {
           <Form.Item
             name="last_name"
             label="Last name"
+            initialValue={account?.last_name}
             rules={[
               {
                 required: true,

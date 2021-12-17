@@ -19,11 +19,16 @@ export const AppError: React.FC<Props> = ({ error, loading }) => {
     <div className="h-screen w-screen flex justify-center items-center">
       <Result
         status="warning"
-        title="Виникла помилка під час завантаження додатку"
+        title="An error occured during app loading"
         subTitle={error}
         extra={
-          <Button type="primary" onClick={clickHandler} loading={loading}>
-            Спробувати ще раз
+          <Button
+            className="bg-sky-500"
+            type="primary"
+            onClick={clickHandler}
+            loading={loading}
+          >
+            Try again
           </Button>
         }
       />

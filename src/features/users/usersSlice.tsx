@@ -1,91 +1,121 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Id, User, WithId, WithIsLiked, WithPhoto } from '../../app/types';
+import {
+  Id,
+  LikeInfo,
+  User,
+  WithId,
+  WithIsLiked,
+  WithPhoto,
+} from '../../app/types';
 import { usersAPI } from './usersApi';
+import { AuthState } from '../auth/authSlice';
+import { AxiosError } from 'axios';
 
 export interface UsersState {
   users: (User & WithId & WithPhoto & WithIsLiked)[] | null;
   isUsersFetching: boolean;
   usersFetchingError: string | null;
-  totalUsers: number;
-  usersCount: number;
-  usersPage: number;
+
+  isLiking: boolean;
+  likingError: string | null;
+
+  totalLikes: number;
+  isLikesFetching: boolean;
+  totalLikesError: string | null;
 }
 
 const initialState: UsersState = {
-  users: [
-    // {
-    //   id: '1',
-    //   description:
-    //     ' gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga gagagagagaga',
-    //   email: '1 User@gmail.om',
-    //   photo: null,
-    //   username: 'username 1',
-    //   isLiked: false,
-    //   first_name: 'vasya',
-    //   last_name: 'belo',
-    // },
-    // {
-    //   id: '2',
-    //   description: '2 User',
-    //   email: '2 User@gmail.om',
-    //   photo: null,
-    //   username: 'username 2',
-    //   isLiked: false,
-    //   first_name: 'pol',
-    //   last_name: 'verz',
-    // },
-    // {
-    //   id: '3',
-    //   description: '3 User',
-    //   email: '3 User@gmail.om',
-    //   photo: null,
-    //   username: 'username 3',
-    //   isLiked: true,
-    //   first_name: 'jhg',
-    //   last_name: 'etur',
-    // },
-    // {
-    //   id: '4',
-    //   description: '4 User',
-    //   email: '4 User@gmail.om',
-    //   photo: null,
-    //   username: 'username 4',
-    //   isLiked: false,
-    //   first_name: ';p;',
-    //   last_name: 'kljk',
-    // },
-    // {
-    //   id: '5',
-    //   description: '5 User',
-    //   email: '5 User@gmail.om',
-    //   photo: null,
-    //   username: 'username 5',
-    //   isLiked: true,
-    //   first_name: 'bvm',
-    //   last_name: 'zxczx',
-    // },
-  ],
+  users: [],
   isUsersFetching: false,
   usersFetchingError: null,
-  totalUsers: 0,
-  usersCount: 2,
-  usersPage: 0,
+
+  isLiking: false,
+  likingError: null,
+
+  totalLikes: 0,
+  isLikesFetching: false,
+  totalLikesError: null,
 };
 
-export const getUsers = createAsyncThunk('users/fetch', async () => {
-  const response = await usersAPI.getUsers();
-  return response.data;
+export const getUsers = createAsyncThunk<
+  (User & WithId & WithIsLiked & WithPhoto)[],
+  void
+>('users/fetch', async (_, { getState, rejectWithValue }) => {
+  const state = getState() as { auth: AuthState };
+  try {
+    if (state.auth.account?.id) {
+      const response = await usersAPI.getUsers(state.auth.account.id);
+      return response.data;
+    }
+
+    return rejectWithValue('No account id provided');
+  } catch (e) {
+    const error = e as AxiosError<any>;
+
+    if (!error.response) {
+      throw error;
+    }
+
+    return rejectWithValue(error.response.data);
+  }
 });
+
+export const changeLike = createAsyncThunk<LikeInfo[], Id>(
+  'users/likeChange',
+  async (id, { getState, rejectWithValue }) => {
+    const state = getState() as { auth: AuthState };
+    try {
+      if (state.auth.account?.id) {
+        const response = await usersAPI.changeLike(state.auth.account.id, id);
+        return response.data;
+      }
+
+      return rejectWithValue('No account id provided');
+    } catch (e) {
+      const error = e as AxiosError<any>;
+
+      if (!error.response) {
+        throw error;
+      }
+
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getLikes = createAsyncThunk<LikeInfo[], void>(
+  'users/getLikes',
+  async (_, { getState, rejectWithValue }) => {
+    const state = getState() as { auth: AuthState };
+    try {
+      if (state.auth.account?.id) {
+        const response = await usersAPI.getLikes(state.auth.account.id);
+        return response.data;
+      }
+
+      return rejectWithValue('No account id provided');
+    } catch (e) {
+      const error = e as AxiosError<any>;
+
+      if (!error.response) {
+        throw error;
+      }
+
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    changeIsLiked: (state, action: PayloadAction<Id>) => {
-      const user = state.users?.find((u) => u.id === action.payload);
-      if (user) {
-        user.isLiked = !user.isLiked;
-      }
+    likeErrorChanged: (state, action: PayloadAction<string | null>) => {
+      state.likingError = action.payload;
+    },
+
+    totalLikesErrorChanged: (state, action: PayloadAction<string | null>) => {
+      state.totalLikesError = action.payload;
     },
   },
 
@@ -101,9 +131,42 @@ const usersSlice = createSlice({
       .addCase(getUsers.rejected, (state, action) => {
         state.isUsersFetching = false;
         state.usersFetchingError = action.error.message ?? null;
+      })
+
+      .addCase(changeLike.pending, (state) => {
+        state.isLiking = true;
+      })
+      .addCase(changeLike.fulfilled, (state, action) => {
+        state.isLiking = false;
+        if (state.users) {
+          state.users = state.users.map((u) =>
+            u.id === action.meta.arg
+              ? {
+                  ...u,
+                  is_liked: !u.is_liked,
+                }
+              : u
+          );
+        }
+      })
+      .addCase(changeLike.rejected, (state, action) => {
+        state.isLiking = false;
+        state.usersFetchingError = action.error.message ?? null;
+      })
+
+      .addCase(getLikes.pending, (state) => {
+        state.isLikesFetching = true;
+      })
+      .addCase(getLikes.fulfilled, (state, action) => {
+        state.isLikesFetching = false;
+        state.totalLikes = action.payload.length;
+      })
+      .addCase(getLikes.rejected, (state, action) => {
+        state.isLikesFetching = false;
+        state.totalLikesError = action.error.message ?? null;
       }),
 });
 
-export const { changeIsLiked } = usersSlice.actions;
+export const { likeErrorChanged, totalLikesErrorChanged } = usersSlice.actions;
 
 export default usersSlice.reducer;

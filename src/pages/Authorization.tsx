@@ -2,13 +2,8 @@ import { Button, Form, Input, Typography } from 'antd';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector, useErrorMessage } from '../app/hooks';
-import { User, WithPassword } from '../app/types';
+import { Credentials } from '../app/types';
 import { loggingInErrorChanged, logIn } from '../features/auth/authSlice';
-
-export type Credentials = Pick<
-  User & WithPassword,
-  'username' | 'email' | 'password'
->;
 
 export const Authorization: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -78,7 +73,6 @@ export const Authorization: React.FC = () => {
         </Form.Item>
         <Form.Item
           name="password"
-          label="Password"
           rules={[
             {
               required: true,

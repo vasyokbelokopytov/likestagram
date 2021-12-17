@@ -1,32 +1,18 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
-import { Token, User, WithId, WithPassword, WithPhoto } from '../../app/types';
-import { Credentials } from '../../pages/Authorization';
+import {
+  Credentials,
+  DetailMessage,
+  EditingProfileValidationErrors,
+  LoginValidationErrors,
+  RegistationValidationErrors,
+  Token,
+  User,
+  WithId,
+  WithPassword,
+  WithPhoto,
+} from '../../app/types';
 import { authAPI } from './authAPI';
-
-export type DetailMessage = {
-  detail: string;
-};
-
-type ValidationErrors<T> = {
-  [key in keyof T]: string[];
-};
-
-type NonFieldErrors = {
-  non_field_errors?: string[];
-};
-
-type RegistationValidationErrors = ValidationErrors<
-  Partial<User & WithPhoto & WithPassword>
->;
-
-type LoginValidationErrors = ValidationErrors<
-  Partial<Credentials> & NonFieldErrors
->;
-
-type EditingProfileValidationErrors = ValidationErrors<
-  Partial<User> & NonFieldErrors
->;
 
 export interface AuthState {
   account: (User & WithId & WithPhoto) | null;
@@ -37,6 +23,7 @@ export interface AuthState {
 
   isAccountEditing: boolean;
   accountEditingError: string | null;
+  accountEditingSucceedMessage: string | null;
   accountEditingFieldsErrors: EditingProfileValidationErrors | null;
 
   isRegistering: boolean;
@@ -61,6 +48,7 @@ const initialState: AuthState = {
 
   isAccountEditing: true,
   accountEditingError: null,
+  accountEditingSucceedMessage: null,
   accountEditingFieldsErrors: null,
 
   isRegistering: false,
@@ -163,7 +151,7 @@ export const getAccount = createAsyncThunk<
 
 export const editAccount = createAsyncThunk<
   User & WithId & WithPhoto,
-  User,
+  FormData,
   {
     rejectValue: EditingProfileValidationErrors;
   }
@@ -210,6 +198,20 @@ const authSlice = createSlice({
       action: PayloadAction<string | null>
     ) => {
       state.accountFethingError = action.payload;
+    },
+
+    accountEditingErrorChanged: (
+      state,
+      action: PayloadAction<string | null>
+    ) => {
+      state.accountEditingError = action.payload;
+    },
+
+    accountEditingSucceedMessageChanged: (
+      state,
+      action: PayloadAction<string | null>
+    ) => {
+      state.accountEditingSucceedMessage = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -293,6 +295,7 @@ const authSlice = createSlice({
         state.accountEditingFieldsErrors = null;
         state.accountEditingError = null;
         state.isAccountEditing = false;
+        state.accountEditingSucceedMessage = 'Changes applied successfully!';
         state.account = action.payload;
       })
       .addCase(editAccount.rejected, (state, action) => {
@@ -316,6 +319,8 @@ export const {
   loggingOutSucceedMessageChanged,
   accountFetchingErrorChanged,
   loggingOutErrorChanged,
+  accountEditingErrorChanged,
+  accountEditingSucceedMessageChanged,
 } = authSlice.actions;
 
 export default authSlice.reducer;
